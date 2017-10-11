@@ -32,28 +32,28 @@ class NewsSpider(scrapy.Spider):
             recaptcha.solve_captcha(response)
 
 
-        # posts = response.css('.post-item')
-        # for post in posts:
-        #     # follow links to news pages
-        #     href = post.css('a.feed-post-link::attr(href)').extract_first()
-        #
-        #     item = WebcrawlerItem()
-        #     item['url'] = href
-        #     item['title'] = post.css('p.feed-post-body-title::text').extract_first()
-        #     item['abstract'] = post.css('p.feed-post-body-resumo::text').extract_first() if len(post.css('p.feed-post-body-resumo::text')) > 0 else ''
-        #
-        #     if item['title'] in self.get_viseted_pages_title():
-        #         return
-        #
-        #     request = scrapy.Request(href, callback=self.parse_author)
-        #     request.meta['item'] = item
-        #     yield request
-        #
-        # #  Next page
-        # next_page = response.css('div.load-more a::attr(href)').extract_first()
-        # if next_page is not None and self.pages_visited_number < self.pages_depth:
-        #     next_page = 'http://g1.globo.com/' + next_page
-        #     yield scrapy.Request(next_page, callback=self.parse)
+        posts = response.css('.post-item')
+        for post in posts:
+            # follow links to news pages
+            href = post.css('a.feed-post-link::attr(href)').extract_first()
+
+            item = WebcrawlerItem()
+            item['url'] = href
+            item['title'] = post.css('p.feed-post-body-title::text').extract_first()
+            item['abstract'] = post.css('p.feed-post-body-resumo::text').extract_first() if len(post.css('p.feed-post-body-resumo::text')) > 0 else ''
+
+            if item['title'] in self.get_viseted_pages_title():
+                return
+
+            request = scrapy.Request(href, callback=self.parse_author)
+            request.meta['item'] = item
+            yield request
+
+        #  Next page
+        next_page = response.css('div.load-more a::attr(href)').extract_first()
+        if next_page is not None and self.pages_visited_number < self.pages_depth:
+            next_page = 'http://g1.globo.com/' + next_page
+            yield scrapy.Request(next_page, callback=self.parse)
 
 
     def parse_author(self, response):
